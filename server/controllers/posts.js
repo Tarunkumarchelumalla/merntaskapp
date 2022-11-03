@@ -1,12 +1,29 @@
 import express from 'express';
 import PostMessage from "../models/postMessage.js"
 import mongoose from 'mongoose';
+import Users from '../models/Users.js';
 
-
-
-
-
-
+export const createuser = async (req, res) => {
+        
+    
+    const users = new Users({ 
+        name : req.body.name,
+        email : req.body.email,
+        password : req.body.password,
+       })
+    
+    try {
+       
+        // localStorage.setItem("name",users._id.toString());
+      
+        await users.save();
+        
+        res.status(201).json(users);
+       
+    } catch (error) {
+        res.status(409).json({ message: error.message });
+    }
+}
     export const createPost = async (req, res) => {
         
     
@@ -33,13 +50,24 @@ import mongoose from 'mongoose';
             res.status(404).json({ message: error.message });
         }
     }
+    export const getuserbyid = async (req, res) => { 
+        try {
+            const { id } = req.params;
+            const userdata = await Users.findById(id);
+         
+            res.status(200).json(userdata);
+        } catch (error) {
+            res.status(404).json({ message: error.message });
+        }
+    }
+    
     export const updatePost = async (req, res) => {
         const { id } = req.params;
-        const { naem,description,email,message } = req.body;
+        const { name,description,email,message } = req.body;
         
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
     
-        const updatedPost = { naem,description,email,message, _id: id };
+        const updatedPost = { name,description,email,message, _id: id };
     
         await PostMessage.findByIdAndUpdate(id, updatedPost, { new: true });
     
